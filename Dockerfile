@@ -16,7 +16,7 @@ COPY . .
 # Build the Next.js application
 RUN npm run build
 
-# Move to nginx image to serve the static files
+# Use nginx image to serve the static files
 FROM nginx:alpine
 
 # Copy the built files from the builder stage to the Nginx HTML directory
