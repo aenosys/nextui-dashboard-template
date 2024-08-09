@@ -16,14 +16,20 @@ COPY . .
 # Build the Next.js application
 RUN npm run build
 
-# Use nginx image to serve the static files
-FROM nginx:alpine
+# Use a lightweight Node.js image for production
+FROM node:18-alpine AS runner
 
-# Copy the built files from the builder stage to the Nginx HTML directory
-COPY --from=builder /app/out /usr/share/nginx/html
+# Set the working directory
+WORKDIR /app
 
-# Expose port 80 to serve the app
-EXPOSE 80
+# Copy the node_modules and build output from the builder stage
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./
 
-# Start the Nginx server
-CMD ["nginx", "-g", "daemon off;"]
+# Expose the port the app runs on
+EXPOSE 3000
+
+# Start the Next.js server
+CMD ["npm", "start"]
